@@ -146,6 +146,15 @@ public class EarthquakeCityMap extends PApplet {
 	private void selectMarkerIfHover(List<Marker> markers)
 	{
 		// TODO: Implement this method
+		for (Marker m: markers) {
+			if (m.isInside(map, mouseX, mouseY)) {
+				if (lastSelected == null) {
+					m.setSelected(true);
+					lastSelected = (CommonMarker) m;
+				}
+				break;
+			}
+		}
 	}
 	
 	/** The event handler for mouse clicks
@@ -159,8 +168,64 @@ public class EarthquakeCityMap extends PApplet {
 		// TODO: Implement this method
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
+		
+		if (lastClicked != null) {
+			unhideMarkers();
+			lastClicked = null;
+		}
+		else {
+			isEarthquakeClicked();
+			isCityClicked();
+			if (lastClicked == null) {
+				unhideMarkers();
+			}
+		}
 	}
 	
+	private void isEarthquakeClicked() {
+		if (lastClicked != null) {
+			return;
+		}
+		for (Marker qm: quakeMarkers) {
+			if (qm.isInside(map, mouseX, mouseY)){
+				lastClicked = (CommonMarker) qm;
+				for (Marker cm : cityMarkers) {
+					double threatDistance = ((EarthquakeMarker)qm).threatCircle();
+					if (qm.getDistanceTo(cm.getLocation()) > threatDistance) {
+						cm.setHidden(true);
+					}
+					else {
+						cm.setHidden(false);
+					}
+				}
+			}
+			else {
+				qm.setHidden(true);
+			}
+		}
+	}
+	private void isCityClicked() {
+		if (lastClicked != null) {
+			return;
+		}
+		for (Marker cm: cityMarkers) {
+			if (cm.isInside(map, mouseX, mouseY)){
+				lastClicked = (CommonMarker) cm;
+				for (Marker qm : quakeMarkers) {
+					double threatDistance = ((EarthquakeMarker)qm).threatCircle();
+					if (qm.getDistanceTo(cm.getLocation()) >= threatDistance) {
+						qm.setHidden(true);
+					}
+					else {
+						qm.setHidden(false);
+					}
+				}
+			}
+			else {
+				cm.setHidden(true);
+			}
+		}
+	}
 	
 	// loop over and unhide all markers
 	private void unhideMarkers() {
