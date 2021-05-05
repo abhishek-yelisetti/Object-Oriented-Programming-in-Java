@@ -1,6 +1,7 @@
 package module4;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
@@ -140,7 +141,7 @@ public class EarthquakeCityMap extends PApplet {
 		textAlign(LEFT, CENTER);
 		textSize(12);
 		text("Earthquake Key", 50, 75);
-		
+		/*
 		fill(color(255, 0, 0));
 		ellipse(50, 125, 15, 15);
 		fill(color(255, 255, 0));
@@ -151,7 +152,30 @@ public class EarthquakeCityMap extends PApplet {
 		fill(0, 0, 0);
 		text("5.0+ Magnitude", 75, 125);
 		text("4.0+ Magnitude", 75, 175);
-		text("Below 4.0", 75, 225);
+		text("Below 4.0", 75, 225);*/
+		fill(color(255,0,0)); 
+		triangle(50, 100, 60, 100, 55, 92.5f); // City Marker
+		fill(color(255,255,255));
+		ellipse(55, 125, 10, 10); // Land Quake
+		fill(color(255,255,255));
+		rect(50, 150, 10, 10); // Ocean Quake
+		fill(color(255,255,0));
+		ellipse(55, 215, 10, 10); // Shallow
+		fill(color(0,0,255));
+		ellipse(55, 240, 10, 10); // Intermediate
+		fill(color(255,0,0));
+		ellipse(55, 265, 10, 10); // Deep
+		
+		
+		
+		fill(0, 0, 0);
+		text("City Marker", 75, 100);
+		text("Land Quake", 75, 125);
+		text("Ocean Quake", 75, 150);
+		text("Size ~ Magnitude", 50, 175);
+		text("Shallow", 75, 215);
+		text("Intermediate", 75, 240);
+		text("Deep", 75, 265);
 	}
 
 	
@@ -170,7 +194,9 @@ public class EarthquakeCityMap extends PApplet {
 		// If isInCountry ever returns true, isLand should return true.
 		for (Marker m : countryMarkers) {
 			// TODO: Finish this method using the helper method isInCountry
-			
+			if(isInCountry(earthquake,m)) {
+				return true;
+			}						
 		}
 		
 		
@@ -197,6 +223,29 @@ public class EarthquakeCityMap extends PApplet {
 		//     	and (2) if it is on land, that its country property matches 
 		//      the name property of the country marker.   If so, increment
 		//      the country's counter.
+		
+		int oceanQuakes = 0;
+		HashMap<String, Integer> countryQuakeMap = new HashMap<String, Integer>();
+		for (Marker qm: quakeMarkers) {
+			EarthquakeMarker em = (EarthquakeMarker) qm;
+			if (em.isOnLand() == true) {
+				LandQuakeMarker lqm = (LandQuakeMarker) em;
+				String quakeCountry = (String)lqm.getProperty("country");
+				if (countryQuakeMap.containsKey(quakeCountry)){
+	                countryQuakeMap.put(quakeCountry, countryQuakeMap.get(quakeCountry)+1);
+	            }
+	            else{
+	                countryQuakeMap.put(quakeCountry, 1);
+	            }
+			}
+			else {
+				oceanQuakes += 1;
+			}
+		}
+		countryQuakeMap.put("OCEAN QUAKES", oceanQuakes);
+		for (String key: countryQuakeMap.keySet()) {
+			System.out.println(key + ": " + countryQuakeMap.get(key));
+		}
 		
 		// Here is some code you will find useful:
 		// 
